@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 "use client";
 
 import { useEffect, useState } from "react";
@@ -8,81 +7,39 @@ import { supabase } from "@/lib/supabase";
 export default function DashboardPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
 
-  const [name, setName] = useState("");
-  const [image, setImage] = useState<File | null>(null);
-
-  // Check login
   useEffect(() => {
-    async function checkAuth() {
-      const { data } = await supabase.auth.getSession();
-
-      if (!data.session) {
-        router.push("/login"); // redirect if not logged in
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.push("/login");
       } else {
-        setLoading(false);
+        setUser(session.user);
       }
-    }
+      setLoading(false);
+    };
 
-    checkAuth();
+    checkUser();
   }, [router]);
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-
-    if (!name || !image) {
-      alert("Please fill all fields");
-      return;
-    }
-
-    alert("Fake upload successful ✅ (Phase 1)");
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading...
-      </div>
-    );
-  }
+  if (loading) return (
+    <div className="flex min-h-screen items-center justify-center bg-stone-50">
+      <p className="text-stone-500 animate-pulse">Loading Dashboard...</p>
+    </div>
+  );
 
   return (
-    <main className="min-h-screen bg-stone-50 px-6 py-20">
-      <div className="max-w-xl mx-auto bg-white p-6 rounded-xl shadow">
-
-        <h1 className="text-2xl font-semibold mb-6 text-center">
-          Designer Dashboard
-        </h1>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-
-          <input
-            type="text"
-            placeholder="Designer Name"
-            className="w-full border p-2 rounded"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-
-          <input
-            type="file"
-            accept="image/*"
-            className="w-full border p-2 rounded"
-            onChange={(e) =>
-              setImage(e.target.files?.[0] || null)
-            }
-          />
-
-          <button
-            type="submit"
-            className="w-full bg-black text-white py-2 rounded"
-          >
-            Upload
-          </button>
-
-        </form>
+    <div className="min-h-screen bg-stone-50 p-8">
+      <div className="mx-auto max-w-4xl">
+        <h1 className="text-3xl font-light">Dashboard</h1>
+        <p className="mt-2 text-stone-600">Welcome back, {user?.email}</p>
+        
+        {/* Your Form or Content for Bay'r goes here */}
+        <div className="mt-10 rounded-xl border border-dashed border-stone-300 p-20 text-center">
+          <p className="text-stone-400">Designer Management coming soon.</p>
+        </div>
       </div>
-    </main>
+    </div>
   );
 }
-
