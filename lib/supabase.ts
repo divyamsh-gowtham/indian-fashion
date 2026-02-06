@@ -1,9 +1,24 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
+let client: SupabaseClient | null = null;
 
-export const supabase = createClient(
-  supabaseUrl,
-  supabaseAnonKey
-);
+export function getSupabaseClient() {
+  // ❗ Do NOT run on server / build time
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  if (client) return client;
+
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !key) {
+    console.error("Missing Supabase env variables");
+    return null;
+  }
+
+  client = createClient(url, key);
+
+  return client;
+}
