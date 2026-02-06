@@ -3,7 +3,6 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 let client: SupabaseClient | null = null;
 
 export function getSupabaseClient() {
-  // ❗ Do NOT run on server / build time
   if (typeof window === "undefined") {
     return null;
   }
@@ -14,7 +13,7 @@ export function getSupabaseClient() {
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!url || !key) {
-    console.error("Missing Supabase env variables");
+    console.error("Missing Supabase env vars");
     return null;
   }
 
