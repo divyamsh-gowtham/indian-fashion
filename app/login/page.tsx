@@ -1,92 +1,69 @@
-export const dynamic = "force-dynamic";
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
-  async function handleLogin() {
-    setLoading(true);
-
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
-    
     });
 
     if (error) {
-      alert(error.message);
+      setError(error.message);
     } else {
-      alert("Login successful!");
+      router.push("/dashboard");
     }
-
-    setLoading(false);
-  }
-
-  async function handleSignup() {
-    setLoading(true);
-
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-
-    if (error) {
-      alert(error.message);
-    } else {
-      alert("Signup successful! Check your email.");
-    }
-
-    setLoading(false);
-  }
+  };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-stone-50">
-      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md space-y-5">
+    <div className="flex min-h-screen items-center justify-center bg-stone-50 px-4">
+      <div className="w-full max-w-md space-y-8 rounded-2xl border bg-white p-8 shadow-sm">
+        <div className="text-center">
+          <h2 className="text-2xl font-light tracking-tight">Bay’r Internal</h2>
+          <p className="mt-2 text-sm text-stone-500">Sign in to manage collections</p>
+        </div>
 
-        <h1 className="text-2xl font-semibold text-center">
-          Login to Bay’r
-        </h1>
+        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
+          <div className="space-y-4">
+            <input
+              type="email"
+              placeholder="Email"
+              className="w-full rounded-lg border border-stone-200 px-4 py-3 outline-none focus:ring-2 focus:ring-black/5"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              className="w-full rounded-lg border border-stone-200 px-4 py-3 outline-none focus:ring-2 focus:ring-black/5"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
 
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full border p-2 rounded"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+          {error && <p className="text-sm text-red-500">{error}</p>}
 
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full border p-2 rounded"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        <button
-          onClick={handleLogin}
-          disabled={loading}
-          className="w-full bg-black text-white py-2 rounded"
-        >
-          Login
-        </button>
-
-        <button
-          onClick={handleSignup}
-          disabled={loading}
-          className="w-full border py-2 rounded"
-        >
-          Sign Up
-        </button>
-
+          <button
+            type="submit"
+            className="w-full rounded-lg bg-black py-3 font-medium text-white transition hover:bg-stone-800"
+          >
+            Sign In
+          </button>
+        </form>
       </div>
-    </main>
+    </div>
   );
 }
-
-
